@@ -17,13 +17,6 @@ type QueryComputation struct {
 	Identifier string
 }
 
-// QueryLog contains a log entry for a query
-type QueryLog struct {
-	QueryID  string
-	Type     QueryLogType
-	LogEntry string
-}
-
 func StartQueryListener() chan Query {
 	qc := make(chan Query)
 	go func() {
