@@ -2,19 +2,17 @@ package mpc
 
 import (
 	"encoding/json"
-	"flag"
 	"log"
 	"math/big"
-	"os"
-)
 
-var output *os.File
+	"github.com/odysseyhack/mpan-compute-initiator/nodecomm"
+)
 
 type QueryType int
 
 const (
-	QUERY_TYPE_INFO = 0
-	QUERY_TYPE_CALC = 1
+	QUERY_TYPE_INFO QueryType = 0
+	QUERY_TYPE_CALC QueryType = 1
 )
 
 // Query is the type of query this MPC system supports
@@ -50,18 +48,5 @@ func doQuery(query Query) {
 
 	log.Printf("Marshalled: %s", jsonQuery)
 
-	output.Write(append(jsonQuery, '\n'))
-}
-
-// In init we make a named pipe for comms to the mpc node and prepare it for writing
-func init() {
-	filename := flag.String("filename", "/tmp/computeInitiatorOutput", "Named pipe for output to mpc node")
-	flag.Parse()
-
-	os.Remove(*filename)
-	var err error
-	output, err = os.OpenFile(*filename, os.O_WRONLY|os.O_CREATE, os.ModeNamedPipe)
-	if err != nil {
-		log.Fatalf("Can not open named pipe %v, %v", *filename, err)
-	}
+	nodecomm.Send(append(jsonQuery, '\n'))
 }
