@@ -1,6 +1,7 @@
 package smartcontract
 
 //go:generate abigen -abi governance.abi -pkg smartcontract -type Governance -out governance.go
+//go:generate abigen -abi gatekeeper.abi -pkg smartcontract -type Gatekeeper -out gatekeeper.go
 
 import (
 	"log"
@@ -8,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/event" //temp
 	"github.com/odysseyhack/mpan-compute-initiator/mpc"
 )
 
@@ -34,18 +34,18 @@ func WaitForQuery(queryChan chan mpc.Query) {
 	}
 
 	// Instantiate the contract and display its name
-	computeContract, err := NewComputeContract(computeAddress, conn)
+	gatekeeper, err := NewGatekeeper(computeAddress, conn)
 	if err != nil {
 		log.Fatalf("Failed to instantiate the Compute contract: %v", err)
 	}
 
 	log.Println("Waiting for smart-contract approved queries.")
 
-	var realEventChannel = make(chan *ComputeContractNewTrigger)
+	var realEventChannel = make(chan *GatekeeperQuery)
 	var blockNumber uint64 = 1
 	opts := &bind.WatchOpts{}
 	opts.Start = &blockNumber
-	_, err = computeContract.WatchNewTrigger(opts, realEventChannel)
+	_, err = gatekeeper.WatchQuery(opts, realEventChannel, nil)
 	if err != nil {
 		log.Fatal("Unable to subscribe to event!", err)
 	}
@@ -57,9 +57,9 @@ func WaitForQuery(queryChan chan mpc.Query) {
 
 		// Now create a query
 		q := mpc.Query{
-			QueryType:       mpc.QueryType(event.QueryType),
-			Identifier:      int(event.Identifier),
-			Attribute:       int(event.Attribute),
+			QueryType:       mpc.QueryType(int(event.QueryType.Int64())),
+			Identifier:      int(event.Identifier.Int64()),
+			Attribute:       int(event.Attribute.Int64()),
 			ClientReference: event.ClientReference,
 		}
 
@@ -68,21 +68,4 @@ func WaitForQuery(queryChan chan mpc.Query) {
 		queryChan <- q
 
 	}
-}
-
-// temporary
-type ComputeContract struct{}
-type ComputeContractNewTrigger struct {
-	QueryType       int
-	Identifier      int
-	Attribute       int
-	ClientReference string
-}
-
-func NewComputeContract(address common.Address, backend bind.ContractBackend) (*ComputeContract, error) {
-	return nil, nil
-}
-
-func (_ComputeContract *ComputeContract) WatchNewTrigger(opts *bind.WatchOpts, sink chan<- *ComputeContractNewTrigger) (event.Subscription, error) {
-	return nil, nil
 }
