@@ -4,7 +4,6 @@ package smartcontract
 
 import (
 	"log"
-	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -15,7 +14,7 @@ import (
 
 const (
 	SMARTCONTRACT_ADDRESS = "0x368f79382cc5a7b769134369a2de7f5b97b28041"
-	ETHEREUM_URL          = "ws://134.221.210.18:8546"
+	ETHEREUM_URL          = "ws://127.0.0.1:8546"
 )
 
 func WaitForQuery(queryChan chan mpc.Query) {
@@ -57,10 +56,10 @@ func WaitForQuery(queryChan chan mpc.Query) {
 
 		// Now create a query
 		q := mpc.Query{
-			QueryType:  mpc.QueryType(event.QueryType),
-			Identifier: int(event.Identifier),
-			Attribute:  int(event.Attribute),
-			QueryId:    event.ClientReference,
+			QueryType:       mpc.QueryType(event.QueryType),
+			Identifier:      int(event.Identifier),
+			Attribute:       int(event.Attribute),
+			ClientReference: event.ClientReference,
 		}
 
 		log.Printf("(SmartContract) q: %v\n", q)
