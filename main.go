@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/odysseyhack/mpan-compute-initiator/mpc"
-	"github.com/odysseyhack/mpan-compute-initiator/smartconract"
+	"github.com/odysseyhack/mpan-compute-initiator/smartcontract"
 )
 
 func main() {
