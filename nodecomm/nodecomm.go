@@ -13,9 +13,8 @@ func init() {
 	filename := flag.String("filename", "/tmp/computeInitiatorOutput", "Named pipe for output to mpc node")
 	flag.Parse()
 
-	os.Remove(*filename)
 	var err error
-	output, err = os.OpenFile(*filename, os.O_WRONLY|os.O_CREATE, os.ModeNamedPipe)
+	output, err = os.OpenFile(*filename, os.O_RDWR, os.ModeNamedPipe)
 	if err != nil {
 		log.Fatalf("Can not open named pipe %v, %v", *filename, err)
 	}
