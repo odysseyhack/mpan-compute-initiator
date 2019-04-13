@@ -3,7 +3,6 @@ package mpc
 import (
 	"encoding/json"
 	"log"
-	"math/big"
 
 	"github.com/odysseyhack/mpan-compute-initiator/nodecomm"
 )
@@ -17,10 +16,10 @@ const (
 
 // Query is the type of query this MPC system supports
 type Query struct {
-	QueryType  QueryType
-	Identifier int
-	Attribute  int
-	QueryId    *big.Int
+	QueryType       QueryType
+	Identifier      int
+	Attribute       int
+	ClientReference string
 }
 
 // Listener loop just does queries sent to its channel
@@ -37,7 +36,7 @@ func StartQueryListener() chan Query {
 // Send a query to the mpc node
 func doQuery(query Query) {
 	// For now, we just print it (looks nice for the dashboard)
-	log.Print("Received a query with ID %v:\n", *query.QueryId)
+	log.Print("Received a query with ID %v:\n", query.ClientReference)
 	log.Printf("  %v(%v, %v)\n", query.QueryType, query.Identifier, query.Attribute)
 
 	jsonQuery, err := json.Marshal(query)
