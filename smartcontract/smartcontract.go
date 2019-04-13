@@ -1,6 +1,6 @@
 package smartcontract
 
-//go:generate abigen -abi gate_keeper.abi -pkg smartcontract -type ComputeContract -out gatekeeper.go
+//go:generate abigen -abi governance.abi -pkg smartcontract -type Governance -out governance.go
 
 import (
 	"log"
@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	SMARTCONTRACT_ADDRESS = "0x368f79382cc5a7b769134369a2de7f5b97b28041"
+	SMARTCONTRACT_ADDRESS = "0xa652605f3794d5cd868aa5f295e60fae924fe836"
 	ETHEREUM_URL          = "ws://127.0.0.1:8546"
 )
 
@@ -23,11 +23,12 @@ func WaitForQuery(queryChan chan mpc.Query) {
 		log.Fatalf("Failed to connect to the Ethereum client: %v", err)
 	}
 
-	gatekeeper, err := NewGovernance(common.HexToAddress(SMARTCONTRACT_ADDRESS), conn)
+	governance, err := NewGovernance(common.HexToAddress(SMARTCONTRACT_ADDRESS), conn)
 	if err != nil {
 		log.Fatalf("Failed to instantiate the Governance contract: %v", err)
 	}
-	computeAddress, err := gatekeeper.GetContractAddress()
+
+	computeAddress, err := governance.GetGatekeeperAddress(nil)
 	if err != nil {
 		log.Fatalf("Failed to talk to the Governance contract: %v", err)
 	}
@@ -84,14 +85,4 @@ func NewComputeContract(address common.Address, backend bind.ContractBackend) (*
 
 func (_ComputeContract *ComputeContract) WatchNewTrigger(opts *bind.WatchOpts, sink chan<- *ComputeContractNewTrigger) (event.Subscription, error) {
 	return nil, nil
-}
-
-func NewGovernance(address common.Address, backend bind.ContractBackend) (*Governance, error) {
-	return nil, nil
-}
-
-type Governance struct{}
-
-func (_Governance *Governance) GetContractAddress() (common.Address, error) {
-	return common.HexToAddress("0x0"), nil
 }
