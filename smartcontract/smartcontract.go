@@ -18,28 +18,30 @@ const (
 )
 
 func WaitForQuery(queryChan chan mpc.Query) {
+	log.Println("(SmartContract) Starting WaitForQuery")
+
 	conn, err := ethclient.Dial(ETHEREUM_URL)
 	if err != nil {
-		log.Fatalf("Failed to connect to the Ethereum client: %v", err)
+		log.Fatalf("(SmartContract) Failed to connect to the Ethereum client: %v", err)
 	}
 
 	governance, err := NewGovernance(common.HexToAddress(SMARTCONTRACT_ADDRESS), conn)
 	if err != nil {
-		log.Fatalf("Failed to instantiate the Governance contract: %v", err)
+		log.Fatalf("(SmartContract) Failed to instantiate the Governance contract: %v", err)
 	}
 
 	computeAddress, err := governance.GetGatekeeperAddress(nil)
 	if err != nil {
-		log.Fatalf("Failed to talk to the Governance contract: %v", err)
+		log.Fatalf("(SmartContract) Failed to talk to the Governance contract: %v", err)
 	}
 
 	// Instantiate the contract and display its name
 	gatekeeper, err := NewGatekeeper(computeAddress, conn)
 	if err != nil {
-		log.Fatalf("Failed to instantiate the Compute contract: %v", err)
+		log.Fatalf("(SmartContract) Failed to instantiate the Gatekeeper contract: %v", err)
 	}
 
-	log.Println("Waiting for smart-contract approved queries.")
+	log.Println("(SmartContract) Contracts found")
 
 	var realEventChannel = make(chan *GatekeeperQuery)
 	var blockNumber uint64 = 1
@@ -47,8 +49,10 @@ func WaitForQuery(queryChan chan mpc.Query) {
 	opts.Start = &blockNumber
 	_, err = gatekeeper.WatchQuery(opts, realEventChannel, nil)
 	if err != nil {
-		log.Fatal("Unable to subscribe to event!", err)
+		log.Fatal("(SmartContract) Unable to subscribe to event!", err)
 	}
+
+	log.Println("(SmartContract) Waiting for smart-contract approved queries.")
 
 	for {
 

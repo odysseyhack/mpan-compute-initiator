@@ -24,10 +24,14 @@ type Query struct {
 
 // Listener loop just does queries sent to its channel
 func StartQueryListener() chan Query {
+	log.Println("Starting query listener")
 	qc := make(chan Query)
 	go func() {
 		for {
-			doQuery(<-qc)
+			q := <-qc
+
+			log.Printf("(Query listener) Got query %v", q)
+			doQuery(q)
 		}
 	}()
 	return qc
@@ -36,16 +40,16 @@ func StartQueryListener() chan Query {
 // Send a query to the mpc node
 func doQuery(query Query) {
 	// For now, we just print it (looks nice for the dashboard)
-	log.Print("Received a query with ID %v:\n", query.ClientReference)
-	log.Printf("  %v(%v, %v)\n", query.QueryType, query.Identifier, query.Attribute)
+	log.Printf("(doQuery) Received a query with ID %v:\n", query.ClientReference)
+	log.Printf("(doQuery)   %v(%v, %v)\n", query.QueryType, query.Identifier, query.Attribute)
 
 	jsonQuery, err := json.Marshal(query)
 	if err != nil {
-		log.Printf("!!! Error marshaling to string, %v", err)
+		log.Printf("(doQuery) !!! Error marshaling to string, %v", err)
 		return
 	}
 
-	log.Printf("Marshalled: %s", jsonQuery)
+	log.Printf("(doQuery) Marshalled: %s", jsonQuery)
 
 	nodecomm.Send(append(jsonQuery, '\n'))
 }
